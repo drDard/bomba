@@ -1,0 +1,23 @@
+bomba function
+
+
+
+
+server riceve la connessione
+genera un numero casuale tra 5 25 e non lo fa vedere al client
+il client inizia la partita inserendo un numero che vuole. se il numero è maggiore del numero creato dal server. il client perdre(esplode)
+se il numero che inserisce è minore. il server riceve il numero inserito e lo sottrae al numero creato.
+successivamente il server fa la sua mossa e sottrae un numero casuale. la logica è quella di prima. 
+chi fa esplodere la bomba perde. quando qualcuno perde viene inviato il messaggio sia al client sia al server
+
+
+parte grafica
+ sfondo immagine
+2 immagini utenti (uno sopra e uno sotto) bomba che esce vicino l'utente quando cel'ha in mano
+schermata rossa se perdi con scritta hai perso ( e fai comparire una schermata blu di windows errore)
+schermata verde se vinci con la scritta hai vinto( e fai uscire un avviso che il pc si sta surriscaldando)
+gli effetti di vincita o perdita devono essere solo dalla parte del client
+
+
+
+
