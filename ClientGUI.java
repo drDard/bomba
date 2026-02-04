@@ -31,7 +31,7 @@ public class ClientGUI extends JFrame {
     private void initComponents() {
         pannelloCentrale = new JPanel(new BorderLayout(20, 20));
         pannelloCentrale.setBorder(BorderFactory.createEmptyBorder(40, 40, 40, 40));
-        pannelloCentrale.setBackground(new Color(30, 30, 50));
+        pannelloCentrale.setBackground(new Color(230, 30, 50));
 
         // Messaggio grande al centro
         lblStato = new JLabel("Connessione in corso...", SwingConstants.CENTER);
@@ -145,7 +145,8 @@ public class ClientGUI extends JFrame {
         try {
             int numero = Integer.parseInt(testo);
             if (numero <= 0) {
-                JOptionPane.showMessageDialog(this, "Inserisci un numero positivo!", "Errore",
+                JOptionPane.showMessageDialog(this, "Inserisci il numero di secondi che vuoi tenere la bomba!",
+                        "Errore",
                         JOptionPane.WARNING_MESSAGE);
                 return;
             }

@@ -33,7 +33,7 @@ public class Server {
                 System.out.println("Nuova partita - valore bomba (solo server): " + bomba);
 
                 out.println("Nuova partita iniziata!");
-                out.println("Tocca a te! Inserisci un numero positivo:");
+                out.println("Inserisci il numero di secondi che vuoi tenere la bomba!");
 
                 int valoreAttuale = bomba;
                 boolean partitaInCorso = true;
@@ -78,7 +78,7 @@ public class Server {
                                 partitaInCorso = false;
                             } else {
                                 valoreAttuale -= mossaServer;
-                                out.println("Server ha tolto " + mossaServer + ". Tocca a te!");
+                                out.println("Server ha tenuto la bomba " + mossaServer + " secondi. Tocca a te!");
                             }
                         }
                     }
@@ -93,7 +93,7 @@ public class Server {
                     out.println("Grazie per aver giocato! Ciao ciao");
                     continua = false;
                 } else {
-                    out.println("Ok! Nuova partita...");
+                    out.println("Nuova partita...");
                 }
             }
 
