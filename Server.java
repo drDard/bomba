@@ -4,42 +4,105 @@ import java.util.Random;
 
 public class Server {
     public static void main(String[] args) {
-        final int PORT = 7777;
+        int port = 12345;
 
-        try (ServerSocket server = new ServerSocket(PORT)) {
-            System.out.println("[SERVER] In ascolto sulla porta " + PORT);
+        try (ServerSocket serverSocket = new ServerSocket(port)) {
+            System.out.println("Server avviato sulla porta " + port + " ... in attesa");
 
-            try (Socket client = server.accept();
-                    PrintWriter out = new PrintWriter(client.getOutputStream(), true);
-                    BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()))) {
+            while (true) {
+                Socket client = serverSocket.accept();
+                System.out.println("Giocatore connesso!");
+                new Thread(() -> giocaPartita(client)).start();
+            }
 
-                System.out.println("[SERVER] Client connesso");
+        } catch (IOException e) {
+            System.out.println("Errore server: " + e.getMessage());
+        }
+    }
 
-                Random r = new Random();
-                int miccia = r.nextInt(6) + 5; // 5..10
-                System.out.println("Bomba armata: miccia = " + miccia);
+    private static void giocaPartita(Socket client) {
+        try (
+            BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+            PrintWriter out = new PrintWriter(client.getOutputStream(), true)
+        ) {
+            Random rand = new Random();
+            boolean continua = true;
 
-                out.println(miccia);
+            while (continua) {
+                int bomba = rand.nextInt(21) + 5; // 5–25
+                System.out.println("Nuova partita - valore bomba (solo server): " + bomba);
 
-                String line;
-                while ((line = in.readLine()) != null) {
-                    int val = Integer.parseInt(line.trim());
-                    System.out.println("  Ricevuto: " + val);
+                out.println("Nuova partita iniziata!");
+                out.println("Tocca a te! Inserisci un numero positivo:");
 
-                    if (val <= 0) {
-                        System.out.println("!!! BOOM !!! Server fa esplodere la bomba!");
-                        break;
+                int valoreAttuale = bomba;
+                boolean partitaInCorso = true;
+
+                while (partitaInCorso) {
+                    String linea = in.readLine();
+                    if (linea == null) return;
+
+                    int scelta;
+                    try {
+                        scelta = Integer.parseInt(linea.trim());
+                    } catch (NumberFormatException e) {
+                        out.println("Numero non valido! Inserisci un numero intero positivo.");
+                        continue;
                     }
 
-                    val--;
-                    System.out.println("  Invio: " + val);
-                    out.println(val);
-                    out.flush();
+                    if (scelta <= 0) {
+                        out.println("Deve essere positivo! Riprova.");
+                        continue;
+                    }
+
+                    if (scelta >= valoreAttuale) {
+                        out.println("BOOM! Hai perso!");
+                        System.out.println("Client ha perso");
+                        partitaInCorso = false;
+                    } else {
+                        valoreAttuale -= scelta;
+                        System.out.println("Client toglie " + scelta + " → resta " + valoreAttuale);
+
+                        // Turno server
+                        if (valoreAttuale <= 0) {
+                            out.println("Non ho più mosse... HAI VINTO!");
+                            System.out.println("Server perso");
+                            partitaInCorso = false;
+                        } else {
+                            int mossaServer = rand.nextInt(5) + 1; // 1–5
+                            System.out.println("Server toglie " + mossaServer);
+
+                            if (mossaServer > valoreAttuale) {
+                                out.println("Il server ha fatto esplodere la bomba! HAI VINTO!");
+                                System.out.println("Server perso");
+                                partitaInCorso = false;
+                            } else {
+                                valoreAttuale -= mossaServer;
+                                out.println("Server ha tolto " + mossaServer + ". Tocca a te!");
+                            }
+                        }
+                    }
                 }
 
+                // Fine partita → chiedi se rigiocare
+                out.println("Partita finita!");
+                out.println("Vuoi giocare ancora? (si/no)");
+
+                String risposta = in.readLine();
+                if (risposta == null || !risposta.trim().equalsIgnoreCase("si")) {
+                    out.println("Grazie per aver giocato! Ciao ciao");
+                    continua = false;
+                } else {
+                    out.println("Ok! Nuova partita...");
+                }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+
+        } catch (IOException e) {
+            System.out.println("Connessione persa con il client");
+        } finally {
+            try {
+                client.close();
+            } catch (IOException ignored) {}
         }
     }
 }
